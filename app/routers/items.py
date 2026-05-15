@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from .. database import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from .. import models, schemas, database
 
 router = APIRouter(
@@ -8,14 +8,19 @@ router = APIRouter(
     tags=["items"]
 )
 
+# Переводим на асинхрон
 @router.get("/", response_model=list[schemas.ProductResponse])
-def get_items(db: Session = Depends(database.get_db)):
-    return db.query(models.Product).all()
+async def get_items(db: AsyncSession = Depends(database.get_db)):
+    result = await db.execute(select(models.Product))
+    items = result.scalars().all()
+    return items
 
+# Так же переводим на асинхрон
 @router.post("/", response_model=schemas.ProductResponse)
-def create_item(product: schemas.ProductCreate, db: Session = Depends(database.get_db)):
+async def create_item(product: schemas.ProductCreate, db: AsyncSession = Depends(database.get_db)):
     new_product = models.Product(**product.dict())
+
     db.add(new_product)
-    db.commit()
-    db.refresh(new_product)
+    await db.commit()
+    await db.refresh(new_product)
     return new_product
