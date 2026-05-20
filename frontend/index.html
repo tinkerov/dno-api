@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
+    />
+    <title>DNO - Магазин современной техники</title>
+    <link rel="stylesheet" href="style.css"/>
+  </head>
+  <body>
+    <header>
+      <div class="top-bar">
+        <div class="logo">
+          <h1 onclick="showSection('shop')" style="cursor: pointer">DNO.ru</h1>
+        </div>
+        <div class="search-box">
+          <input type="text" placeholder="Поиск товара..." />
+          <button type="button">Найти</button>
+        </div>
+        <div class="nav-links">
+          <span class="nav-btn" onclick="showSection('shop')">Витрина</span>
+          <span class="nav-btn" onclick="showSection('cart')">Корзина (<span id="cart-count">0</span>)</span>
+          <span class="nav-btn" id="auth-nav-btn" onclick="showSection('login')">Войти</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <section id="section-shop" class="spa-section active">
+        <div class="products" id="products-container">
+          </div>
+      </section>
+
+      <section id="section-cart" class="spa-section">
+        <h2>Ваша корзина</h2>
+        <div class="products" id="cart-container"></div>
+        <div class="cart-summary">
+          <h3>Итого: <span id="cart-total">0</span> ₽</h3>
+          <button
+            class="filter-btn"
+            style="margin-top: 15px; width: auto"
+            onclick="checkoutOrder()"
+          >
+            Оформить заказ
+          </button>
+        </div>
+      </section>
+
+      <section id="section-login" class="spa-section">
+        <div class="auth-box">
+          <h2>Вход в аккаунт</h2>
+          <form id="login-form">
+            <input type="email" id="login-email" placeholder="Email" required />
+            <input
+              type="password"
+              id="login-password"
+              placeholder="Пароль"
+              required
+            />
+            <button type="submit" class="filter-btn">Войти</button>
+          </form>
+          <p style="margin-top: 15px; text-align: center">
+            Нет аккаунта?
+            <span
+              style="color: #007bff; cursor: pointer"
+              onclick="showSection('register')"
+              >Зарегистрироваться</span
+            >
+          </p>
+        </div>
+      </section>
+
+      <section id="section-register" class="spa-section">
+        <div class="auth-box">
+          <h2>Регистрация</h2>
+          <form id="register-form">
+            <input
+              type="email"
+              id="register-email"
+              placeholder="Email"
+              required
+            />
+            <input
+              type="password"
+              id="register-password"
+              placeholder="Пароль"
+              required
+            />
+            <button type="submit" class="filter-btn">Создать аккаунт</button>
+          </form>
+          <p style="margin-top: 15px; text-align: center">
+            Уже есть аккаунт?
+            <span
+              style="color: #007bff; cursor: pointer"
+              onclick="showSection('login')"
+              >Войти</span
+            >
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

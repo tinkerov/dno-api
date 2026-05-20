@@ -5,6 +5,7 @@ class ProductCreate(BaseModel):
     name: str
     price: int
     description: Optional[str] = None
+    image_url: Optional[str] = None
 
 class ProductResponse(ProductCreate):
     id: int
