@@ -5,6 +5,7 @@ from . import models
 from .database import engine
 from .routers import items
 from .routers import auth
+from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -14,6 +15,8 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="DNO", lifespan=lifespan)
+
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,

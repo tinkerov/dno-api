@@ -1,7 +1,10 @@
 const API_URL = "http://127.0.0.1:8000";
 
-// Глобальный массив, где будем хранить список всех товаров с бэка
+// Глобальный массив для хранения товаров
 let ALL_PRODUCTS = [];
+
+// Красивая и стабильная заглушка, если картинка не задана или сломалась
+const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop";
 
 document.addEventListener("DOMContentLoaded", () => {
     showSection('shop');
@@ -11,30 +14,26 @@ document.addEventListener("DOMContentLoaded", () => {
     setupAuthForms();
 });
 
-// ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ЭКРАНОВ (SPA ЛОГИКА)
+// ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ЭКРАНОВ (SPA)
 function showSection(sectionName) {
-    // Сначала скрываем ВСЕ секции
     document.querySelectorAll('.spa-section').forEach(section => {
         section.classList.remove('active');
     });
 
-    // Показываем нужную секцию
     const targetSection = document.getElementById(`section-${sectionName}`);
     if (targetSection) targetSection.classList.add('active');
 
-    // Если перешли в корзину — обновляем её содержимое
     if (sectionName === 'cart') {
         renderCart();
     }
 }
 
-// 1. ЗАГРУЗКА ВСЕХ ТОВАРОВ С БЭКЕНДА НА ВИТРИНУ (БЕЗ ФИЛЬТРОВ)
+// 1. ЗАГРУЗКА ТОВАРОВ НА ВИТРИНУ
 async function loadProducts() {
     const container = document.getElementById("products-container");
     if (!container) return;
 
     try {
-        // Делаем прямой и простой запрос на получение всех товаров
         const response = await fetch(`${API_URL}/items`);
         if (!response.ok) throw new Error(`Ошибка: ${response.status}`);
         
@@ -50,11 +49,13 @@ async function loadProducts() {
             const card = document.createElement("div");
             card.className = "product-card";
             
-            // Проверяем наличие картинки. Если её нет (или старая база) — ставим заглушку
-            const imageSrc = product.image_url || "https://via.placeholder.com/150?text=No+Image";
+            // Валидация ссылки на картинку
+            const imageSrc = (product.image_url && product.image_url.trim() !== "") 
+                ? product.image_url 
+                : DEFAULT_IMAGE;
 
             card.innerHTML = `
-                <img src="${imageSrc}" alt="${product.name}">
+                <img src="${imageSrc}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}';">
                 <div class="product-info">
                     <h2 class="product-name" style="font-size: 18px; margin: 10px 0;">${product.name}</h2>
                     <p class="product-desc" style="font-size: 14px; color: #666; flex-grow: 1;">${product.description || ""}</p>
@@ -72,7 +73,7 @@ async function loadProducts() {
     }
 }
 
-// 2. ЛОГИКА КОРЗИНЫ (LOCALSTORAGE)
+// 2. ЛОГИКА КОРЗИНЫ
 function addToCart(productId) {
     let cart = JSON.parse(localStorage.getItem("cart")) || [];
     const item = cart.find(i => i.id === productId);
@@ -117,10 +118,13 @@ function renderCart() {
             totalSum += product.price * cartItem.quantity;
             const card = document.createElement("div");
             card.className = "product-card";
-            const imageSrc = product.image_url || "https://via.placeholder.com/150?text=No+Image";
+            
+            const imageSrc = (product.image_url && product.image_url.trim() !== "") 
+                ? product.image_url 
+                : DEFAULT_IMAGE;
 
             card.innerHTML = `
-                <img src="${imageSrc}" alt="${product.name}">
+                <img src="${imageSrc}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}';">
                 <div class="product-info">
                     <h2 class="product-name" style="font-size: 18px; margin: 10px 0;">${product.name}</h2>
                     <p class="product-desc">Количество: ${cartItem.quantity} шт.</p>

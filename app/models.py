@@ -9,6 +9,7 @@ class Product(Base):
     price = Column(Integer)
     description = Column(String, nullable=True)
     in_stock = Column(Boolean, default=True)
+    image_url = Column(String, nullable=True)
 
 class User(Base):
     __tablename__ = "users"
