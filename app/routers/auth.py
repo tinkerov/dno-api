@@ -7,7 +7,9 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 import os
 from dotenv import load_dotenv
-from .. import models, schemas, database
+from app import models, schemas, database
+from app.database import get_db
+from app.crud import auth as crud_auth
 
 load_dotenv()
 
@@ -77,13 +79,15 @@ async def login(response: Response, user_credentials: OAuth2PasswordRequestForm 
     access_token = create_access_token(data={"user_id": user.id})
     refresh_token = create_refresh_token(data={"user_id": user.id})
 
+    user.refresh_token = refresh_token
+    await db.commit()
+
     # Засовываем в куки браузера
     response.set_cookie(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
         max_age=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
-        expires=REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         samesite="lax",
         secure=False
     )
@@ -123,3 +127,33 @@ async def refresh_session(refresh_token: str = Cookie(None)):
     # Генерация нового токена на 30 минут
     new_access_token = create_access_token(data={"user_id": user_id})
     return {"access_token": new_access_token, "token_type": "bearer"}
+
+# Эндпоинт для выхода пользователя
+@router.post("/logout")
+async def logout(
+    response: Response,
+    refresh_token: str | None = Cookie(default=None),
+    db: AsyncSession = Depends(get_db)
+):
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="You are not authorized"
+        )
+    
+    token_deleted = await crud_auth.delete_refresh_token(db, token=refresh_token)
+
+    if not token_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session token is invalid"
+        )
+    
+    response.delete_cookie(
+        key="refresh_token",
+        httponly=True,
+        secure=False,
+        samesite="lax"
+    )
+
+    return {"message": "Logged out"}

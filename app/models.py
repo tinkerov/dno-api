@@ -18,3 +18,4 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
+    refresh_token = Column(String, nullable=True)
