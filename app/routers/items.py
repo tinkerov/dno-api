@@ -20,7 +20,7 @@ async def get_items(db: AsyncSession = Depends(database.get_db)):
 # Так же переводим на асинхрон
 @router.post("/", response_model=schemas.ProductResponse)
 async def create_item(product: schemas.ProductCreate, db: AsyncSession = Depends(database.get_db)):
-    new_product = models.Product(**product.dict())
+    new_product = models.Product(**product.model_dump())
 
     db.add(new_product)
     await db.commit()
