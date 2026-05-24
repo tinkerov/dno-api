@@ -13,10 +13,12 @@
     <header>
       <div class="top-bar">
         <div class="logo">
-          <h1 onclick="showSection('shop')" style="cursor: pointer">DNO.ru</h1>
+          <h1>
+            <span onclick="showSection('shop')" style="cursor: pointer; display: inline-block;">DNO.ru</span>
+          </h1>
         </div>
         <div class="search-box">
-          <input type="text" placeholder="Поиск товара..." />
+          <input type="text" id="search-input" placeholder="Поиск товара..." />
           <button type="button">Найти</button>
         </div>
         <div class="nav-links">
@@ -29,8 +31,7 @@
 
     <main class="main-content">
       <section id="section-shop" class="spa-section active">
-        <div class="products" id="products-container">
-          </div>
+        <div class="products" id="products-container"></div>
       </section>
 
       <section id="section-cart" class="spa-section">
@@ -101,14 +102,16 @@
         </div>
       </section>
     </main>
+
     <footer class="site-footer">
-    <div class="footer-container">
+      <div class="footer-container">
         <p class="footer-copy">&copy; 2026 DNO.ru. Все права защищены.</p>
         <p class="footer-author">
             <a href="https://t.me/char0n4ikbaby" target="_blank" class="footer-link">@char0n4ikbaby</a>
         </p>
-    </div>
-</footer>
+      </div>
+    </footer>
+
     <script src="script.js"></script>
   </body>
 </html>

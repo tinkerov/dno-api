@@ -25,6 +25,28 @@ h1 {
     background-color: orange;
     color: white;
     box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+/* Флекс-боксы для идеального центрирования поиска */
+.logo {
+    flex: 1;
+}
+
+.nav-links {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex: 1;
+    justify-content: flex-end; /* Ссылки всегда справа */
+}
+
+.search-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 0 1 auto;
+    gap: 5px;
 }
 
 .search-box input {
@@ -32,6 +54,7 @@ h1 {
     padding: 10px 20px;
     border-radius: 20px;
     font-size: 15px;
+    outline: none;
 }
 
 .search-box button {
@@ -133,7 +156,6 @@ button:active { transform: scale(0.95); }
 
 .spa-section { display: none; width: 100%; }
 .spa-section.active { display: block; }
-.nav-links { display: flex; gap: 15px; align-items: center; }
 
 .nav-btn {
     color: white;
@@ -148,7 +170,7 @@ button:active { transform: scale(0.95); }
 .nav-btn:hover { background-color: rgba(255, 255, 255, 0.3); }
 
 /* ==========================================================================
-   АВТОРИЗАЦИЯ (ФИКС)
+   АВТОРИЗАЦИЯ
    ========================================================================== */
 .auth-box { 
     max-width: 350px; 
@@ -174,7 +196,16 @@ button:active { transform: scale(0.95); }
     box-sizing: border-box; 
 }
 
-.cart-summary { background-color: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
+.cart-summary { 
+    background-color: white; 
+    padding: 25px; 
+    border-radius: 15px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    margin-top: 30px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
 
 /* ==========================================================================
    ФУТЕР
@@ -208,9 +239,11 @@ button:active { transform: scale(0.95); }
 .footer-link:hover { color: #00aaff; }
 
 /* ==========================================================================
-   АДАПТИВ
+   АДАТИВНЫЙ ДИЗАЙН
    ========================================================================== */
 @media (max-width: 900px) {
     .top-bar { flex-direction: column; padding: 15px; gap: 10px; }
+    .logo, .nav-links { flex: none; }
+    .nav-links { justify-content: center; }
     .cart-summary { flex-direction: column; gap: 15px; text-align: center; }
 }

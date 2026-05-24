@@ -12,6 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
     checkAuthStatus();
     setupAuthForms();
+
+    // НАСТРОЙКА ЖИВОГО ПОИСКА
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", (e) => {
+            handleSearch(e.target.value);
+        });
+    }
 });
 
 // ФУНКЦИЯ ПЕРЕКЛЮЧЕНИЯ ЭКРАНОВ (SPA)
@@ -45,32 +53,60 @@ async function loadProducts() {
             return;
         }
 
-        ALL_PRODUCTS.forEach(product => {
-            const card = document.createElement("div");
-            card.className = "product-card";
-            
-            // Валидация ссылки на картинку
-            const imageSrc = (product.image_url && product.image_url.trim() !== "") 
-                ? product.image_url 
-                : DEFAULT_IMAGE;
-
-            card.innerHTML = `
-                <img src="${imageSrc}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}';">
-                <div class="product-info">
-                    <h2 class="product-name" style="font-size: 18px; margin: 10px 0;">${product.name}</h2>
-                    <p class="product-desc" style="font-size: 14px; color: #666; flex-grow: 1;">${product.description || ""}</p>
-                </div>
-                <div class="buy-section">
-                    <span class="product-price" style="font-weight: bold; font-size: 18px;">${product.price} ₽</span>
-                    <button class="buy-btn" onclick="addToCart(${product.id})">В корзину</button>
-                </div>
-            `;
-            container.appendChild(card);
-        });
+        renderProductCards(ALL_PRODUCTS, container);
     } catch (error) {
         console.error(error);
         container.innerHTML = "<p style='padding: 20px; color: red;'>Не удалось загрузить товары с бэкенда.</p>";
     }
+}
+
+// ФУНКЦИЯ ФИЛЬТРАЦИИ И ПОИСКА ТОВАРОВ
+function handleSearch(query) {
+    const container = document.getElementById("products-container");
+    if (!container) return;
+
+    const cleanQuery = query.toLowerCase().trim();
+
+    // Фильтруем глобальный массив товаров по имени или описанию
+    const filteredProducts = ALL_PRODUCTS.filter(product => {
+        const nameMatch = product.name.toLowerCase().includes(cleanQuery);
+        const descMatch = (product.description || "").toLowerCase().includes(cleanQuery);
+        return nameMatch || descMatch;
+    });
+
+    container.innerHTML = "";
+
+    if (filteredProducts.length === 0) {
+        container.innerHTML = "<p style='padding: 20px; font-size: 16px; color: #555;'>Ничего не найдено...</p>";
+        return;
+    }
+
+    renderProductCards(filteredProducts, container);
+}
+
+// ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ОТРИСОВКИ КАРТОЧЕК
+function renderProductCards(productsList, container) {
+    productsList.forEach(product => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        
+        const imageSrc = (product.image_url && product.image_url.trim() !== "") 
+            ? product.image_url 
+            : DEFAULT_IMAGE;
+
+        card.innerHTML = `
+            <img src="${imageSrc}" alt="${product.name}" onerror="this.onerror=null; this.src='${DEFAULT_IMAGE}';">
+            <div class="product-info">
+                <h2 class="product-name" style="font-size: 18px; margin: 10px 0;">${product.name}</h2>
+                <p class="product-desc" style="font-size: 14px; color: #666; flex-grow: 1;">${product.description || ""}</p>
+            </div>
+            <div class="buy-section">
+                <span class="product-price" style="font-weight: bold; font-size: 18px;">${product.price} ₽</span>
+                <button class="buy-btn" onclick="addToCart(${product.id})">В корзину</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
 }
 
 // 2. ЛОГИКА КОРЗИНЫ
@@ -216,6 +252,7 @@ function setupAuthForms() {
     }
 }
 
+// ПРОВЕРКА СТАТУСА АВТОРИЗАЦИИ
 function checkAuthStatus() {
     const token = localStorage.getItem("token");
     const authBtn = document.getElementById("auth-nav-btn");
