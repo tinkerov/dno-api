@@ -7,7 +7,7 @@ from app.database import Base, get_db
 from app.main import app
 import pytest_asyncio
 
-TEST_DATABASE_URL = "postgresql+asyncpg://user:password@localhost:5432/my_store_db_test"
+TEST_DATABASE_URL = "postgresql+asyncpg://user:password@127.0.0.1:5432/my_store_db_test"
 
 test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, poolclass=NullPool)
 

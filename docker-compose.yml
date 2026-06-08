@@ -15,13 +15,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - store_network
-    # Строгая проверка: порт открыт + база отвечает на SQL-запрос
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d my_store_db && psql -U user -d my_store_db -c 'SELECT 1;'"]
       interval: 3s
       timeout: 3s
       retries: 5
-      start_period: 5s  # Даем 5 секунд на инициализацию системных файлов базы
+      start_period: 5s
+
+  redis:
+    image: redis:alpine
+    container_name: redis_cache
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - store_network
 
   pgadmin:
     image: dpage/pgadmin4
@@ -41,7 +49,7 @@ services:
 
   backend:
     build:
-      context: ./backend  # Укажи путь к папке, где лежит твой Dockerfile бэкенда
+      context: .
       dockerfile: Dockerfile
     container_name: fastapi_backend
     restart: always
@@ -49,20 +57,20 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://user:password@db:5432/my_store_db
+
+      - REDIS_URL=redis://redis:6379
     depends_on:
       db:
         condition: service_healthy
-    # Подстраховка перед стартом uvicorn, чтобы asyncpg наверняка зацепился
+
     command: sh -c "sleep 2 && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     networks:
       - store_network
 
-# Именованные вольюмы для данных
 volumes:
   postgres_data:
   pgadmin_data:
 
-# Общая докер-сеть
 networks:
   store_network:
     driver: bridge
