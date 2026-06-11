@@ -7,17 +7,19 @@ from .routers import items
 from .routers import auth
 from fastapi.staticfiles import StaticFiles
 import asyncio
+from sqlalchemy import text
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ретраи для подключения к базе данных при старте
+    # Ретраи для проверки подключения к базе данных при старте
     retries = 5
     while retries > 0:
         try:
-            print("Попытка подключения к базе данных и создания таблиц...")
-            async with engine.begin() as conn:
-                await conn.run_sync(models.Base.metadata.create_all)
-            print("Таблицы успешно проверены/созданы!")
+            print("Проверка подключения к базе данных...")
+            # ИСПРАВЛЕНО: Вместо создания таблиц просто пингуем базу
+            async with engine.connect() as conn:
+                await conn.execute(text("SELECT 1"))
+            print("Подключение к базе данных успешно проверено!")
             break  # Если всё прошло успешно, выходим из цикла
         except Exception as e:
             retries -= 1

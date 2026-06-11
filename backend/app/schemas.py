@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class ProductCreate(BaseModel):
@@ -11,8 +11,7 @@ class ProductResponse(ProductCreate):
     id: int
     in_stock: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
@@ -28,8 +27,7 @@ class UserResponse(BaseModel):
     id: int
     email: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 class Token(BaseModel):
     access_token: str
