@@ -3,6 +3,8 @@ services:
     image: postgres:15
     container_name: postgres_db
     restart: always
+    env_file:
+      - .env
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -14,7 +16,8 @@ services:
     networks:
       - store_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB} && psql -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c 'SELECT 1;'"]
+      # Используем переменную, чтобы проверка шла под правильным юзером
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 3s
       timeout: 3s
       retries: 5
@@ -33,6 +36,8 @@ services:
     image: dpage/pgadmin4
     container_name: pgadmin_gui
     restart: always
+    env_file:
+      - .env
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
@@ -53,13 +58,14 @@ services:
     restart: always
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     environment:
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       - REDIS_URL=redis://redis:6379
     depends_on:
       db:
         condition: service_healthy
-
     command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"
     networks:
       - store_network

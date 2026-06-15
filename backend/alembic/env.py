@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from app.database import Base
 import app.models
 from app.database import SQLALCHEMY_DATABASE_URL as DATABASE_URL
-
+import os
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -43,7 +43,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = DATABASE_URL
+    url = os.getenv("DATABASE_URL", DATABASE_URL)
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -83,7 +83,7 @@ async def run_async_migrations() -> None:
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode."""
     configuration = config.get_section(config.config_ini_section) or {}
-    configuration["sqlalchemy.url"] = DATABASE_URL
+    configuration["sqlalchemy.url"] = os.getenv("DATABASE_URL",DATABASE_URL)
 
     connectable = async_engine_from_config(
         configuration,
