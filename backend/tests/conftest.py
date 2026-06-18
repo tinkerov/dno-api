@@ -45,10 +45,16 @@ async def client(db_session):
 
     app.dependency_overrides[get_db] = override_get_db
 
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-            yield ac
+    transport = ASGITransport(app=app)
+
+    async with AsyncClient(
+        transport=transport, 
+        base_url="http://test",
+        cookies={}
+    ) as ac:
+        yield ac
         
-    app.dependency_overrides.clear
+    app.dependency_overrides.clear()
 
 @pytest_asyncio.fixture(scope="function")
 async def auth_client(client):
